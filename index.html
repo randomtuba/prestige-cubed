@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Prestige³</title>
+        <link rel="stylesheet" href="style.css" id="style" />
+        <script src="game.js" defer></script>
+        <script src="save.js" defer></script>
+        <script src="OmegaNum.js" defer></script>
+        <script src="format-omeganum.js" defer></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12" defer></script>
+    </head>
+    <body>
+        <div id="app">
+            <button onclick="save()">Save</button>
+            <button onclick="exportSave()">Export</button>
+            <button onclick="importSave()">Import</button>
+            <button onclick="hardReset()">Hard Reset</button>
+            <br><br>
+            <table>
+                <tr>
+                    <td style="border: 4px solid #ffffff" class="generator">
+                        You have {{format(player.points[0][0][0])}} points.
+                    </td>
+                </tr>
+                <tr v-for="a in player.generators[0][0][0].length">
+                    <td style="border: 4px solid #ffffff" class="generator">
+                        Generator {{a == 1 ? 1 : OmegaNum.add(a, player.highestGenerator[0][0][0].sub(10))}}<br>
+                        Amount: {{format(player.generators[0][0][0][a-1].amount)}} ({{formatWhole(player.generators[0][0][0][a-1].bought)}})<br>
+                        Mult: {{format(Generators.mult(a-1))}}x<br>
+                        Cost: {{format(Generators.cost(a-1))}}<br>
+                        <button @click="Generators.buy(a-1)">
+                            Buy
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>

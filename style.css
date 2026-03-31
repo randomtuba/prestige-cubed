@@ -1,0 +1,22 @@
+body {
+  background-color:black;
+  color:white;
+  border-radius: 5px;
+  font-family: 'Verdana', sans-serif;
+  margin: 2em;
+  text-align: center;
+}
+
+button {
+  font-family: 'Verdana', sans-serif;
+}
+
+table {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.generator {
+  height: 150px;
+  width: 200px;
+}
