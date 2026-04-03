@@ -8,6 +8,7 @@ function start() {
     generators: [[[[]]]],
     highestGenerator: [[[new OmegaNum(10)]]],
     power: [[[null]]],
+    timeInRun: [[[new OmegaNum(0)]]],
   };
   return start;
 }

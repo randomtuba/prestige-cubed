@@ -28,26 +28,33 @@
                     </td>
                     <td v-for="a in player.points[0][0].length - 1" style="border: 4px solid #ffffff; text-align: center" class="generator">
                         You have {{format(player.points[0][0][a])}} Tier {{a}} prestige points and {{format(player.power[0][0][a])}} Tier {{a}} prestige power.<br>
-                        <button v-if="player.points[0][0][a-1].lt(1e24)">1e24 required</button>
-                        <button v-if="player.points[0][0][a-1].gte(1e24)" @click="Prestige.reset(a, false)">Prestige (+{{format(Prestige.formula(a))}})</button>
+                        <button v-if="new OmegaNum(player.points[0][0][a-1]).lt(1e24)">1e24 required</button>
+                        <button v-if="new OmegaNum(player.points[0][0][a-1]).gte(1e24)" @click="Prestige.reset(a, false)">Prestige (+{{format(Prestige.formula(a))}})</button>
+                        <span v-if="player.power[0][0][a+1] != undefined && OmegaNum(player.power[0][0][a+1]).gt(0)">
+                            <br><button @click="Generators.maxAll(a)">Max All</button>
+                        </span>
                     </td>
                 </tr>
                 <tr v-for="a in Math.max(...player.generators[0][0].map(arr => arr.length))">
-                    <td style="border: 4px solid #ffffff; text-align: center" class="generator" v-if="player.generators[0][0][0][a-1] != undefined">
-                        Generator {{a == 1 ? 1 : OmegaNum.add(a, OmegaNum.sub(player.highestGenerator[0][0][0], 10))}}<br>
-                        Amount: {{format(player.generators[0][0][0][a-1].amount)}} ({{formatWhole(player.generators[0][0][0][a-1].bought)}})<br>
-                        Mult: {{format(Generators.mult(0,a-1))}}x<br>
-                        Cost: {{format(Generators.cost(0,a-1))}}<br>
-                        <button @click="Generators.buy(0,a-1)">Buy</button>
-                        <button @click="Generators.buyMax(0,a-1)">Buy Max</button>
+                    <td style="border: 4px solid #ffffff; text-align: center" class="generator" :style="{visiblity: player.generators[0][0][0][a-1] != undefined ? 'visible' : 'hidden', borderColor: player.generators[0][0][0][a-1] != undefined ? 'white' : 'black'}">
+                        <span v-if="player.generators[0][0][0][a-1] != undefined">
+                            Generator {{a == 1 ? 1 : OmegaNum.add(a, OmegaNum.sub(player.highestGenerator[0][0][0], 10))}}<br>
+                            Amount: {{format(player.generators[0][0][0][a-1].amount)}} ({{formatWhole(player.generators[0][0][0][a-1].bought)}})<br>
+                            Mult: {{format(Generators.mult(0,a-1))}}x<br>
+                            Cost: {{format(Generators.cost(0,a-1))}}<br>
+                            <button @click="Generators.buy(0,a-1)">Buy</button>
+                            <button @click="Generators.buyMax(0,a-1)">Buy Max</button>
+                        </span>
                     </td>
-                    <td style="border: 4px solid #ffffff; text-align: center" class="generator" v-if="player.generators[0][0][b][a-1] != undefined" v-for="b in player.generators[0][0].length - 1">
-                        Tier {{b}} Prestige Generator {{a == 1 ? 1 : OmegaNum.add(a, OmegaNum.sub(player.highestGenerator[0][0][b], 10))}}<br>
-                        Amount: {{format(player.generators[0][0][b][a-1].amount)}} ({{formatWhole(player.generators[0][0][b][a-1].bought)}})<br>
-                        Mult: {{format(Generators.mult(b,a-1))}}x<br>
-                        Cost: {{format(Generators.cost(b,a-1))}}<br>
-                        <button @click="Generators.buy(b,a-1)">Buy</button>
-                        <button @click="Generators.buyMax(b,a-1)">Buy Max</button>
+                    <td style="border: 4px solid #ffffff; text-align: center" class="generator" :style="{visibility: player.generators[0][0][b][a-1] != undefined ? 'visible' : 'hidden', borderColor: player.generators[0][0][b][a-1] != undefined ? 'white' : 'black'}" v-for="b in player.generators[0][0].length - 1">
+                        <span v-if="player.generators[0][0][b][a-1] != undefined">
+                            Tier {{b}} Prestige Generator {{a == 1 ? 1 : OmegaNum.add(a, OmegaNum.sub(player.highestGenerator[0][0][b], 10))}}<br>
+                            Amount: {{format(player.generators[0][0][b][a-1].amount)}} ({{formatWhole(player.generators[0][0][b][a-1].bought)}})<br>
+                            Mult: {{format(Generators.mult(b,a-1))}}x<br>
+                            Cost: {{format(Generators.cost(b,a-1))}}<br>
+                            <button @click="Generators.buy(b,a-1)">Buy</button>
+                            <button @click="Generators.buyMax(b,a-1)">Buy Max</button>
+                        </span>
                     </td>
                 </tr>
             </table>

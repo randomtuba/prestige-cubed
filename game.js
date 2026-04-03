@@ -15,6 +15,11 @@ function mainLoop(){
     player.lastTick = time
     player.timePlayed += diff
 
+    // progress time
+    for (let i = 0; i < player.timeInRun[0][0].length; i++) {
+        player.timeInRun[0][0][i] = OmegaNum.add(player.timeInRun[0][0][i], diff)
+    }
+
     // fill your game data with new generators, prestige points, and prestige powers when necessary
     fillArrays()
 
@@ -28,7 +33,7 @@ function mainLoop(){
 
         for (let i = 1; i < generators[j].length; i++) {
             // generator produces the previous one
-            player.generators[0][0][j][i-1].amount = OmegaNum.add(generators[j][i-1].amount, OmegaNum.mul(generators[j][i].amount, Generators.mult(j,i)).mul(j == 0 ? Generators.hiddenMultiplier(i) : 1).mul(diff))
+            player.generators[0][0][j][i-1].amount = OmegaNum.add(generators[j][i-1].amount, OmegaNum.mul(generators[j][i].amount, Generators.mult(j,i)).mul(Generators.hiddenMultiplier(j,i)).mul(diff))
         }
     }
 }
@@ -47,15 +52,16 @@ function fillArrays() {
             })
         }
         if (generators[i].length > 10) {
-            player.highestGenerator[0][0][i] = player.highestGenerator[0][0][i].add(1)
+            player.highestGenerator[0][0][i] = OmegaNum.add(player.highestGenerator[0][0][i], 1)
             player.generators[0][0][i].splice(1, 1);
         }
     }
 
-    // check for points/power
+    // check for points/power/time
     if (OmegaNum(points[points.length - 1]).gte(1e20)) {
         player.points[0][0].push(new OmegaNum(0))
         player.power[0][0].push(new OmegaNum(1))
+        player.timeInRun[0][0].push(new OmegaNum(0))
     }
 }
 
@@ -76,9 +82,12 @@ const Generators = {
         }
     },
     buyMax(a,x) {
+        let tier = OmegaNum.add(x, new OmegaNum(player.highestGenerator[0][0][a]).sub(10))
+        if (x == 0) tier = 0
+
         if (OmegaNum.gte(points[a], Generators.cost(a,x))) {
-            player.generators[0][0][a][x].amount = OmegaNum.add(generators[a][x].amount, OmegaNum.affordGeometricSeries(player.points[0][0][a], OmegaNum.pow(10, OmegaNum.pow(2, x)), OmegaNum.pow(10, OmegaNum.pow(2, x)), player.generators[0][0][a][x].bought))
-            player.generators[0][0][a][x].bought = OmegaNum.add(generators[a][x].bought, OmegaNum.affordGeometricSeries(player.points[0][0][a], OmegaNum.pow(10, OmegaNum.pow(2, x)), OmegaNum.pow(10, OmegaNum.pow(2, x)), player.generators[0][0][a][x].bought).sub(1))
+            player.generators[0][0][a][x].amount = OmegaNum.add(generators[a][x].amount, OmegaNum.affordGeometricSeries(player.points[0][0][a], OmegaNum.pow(10, OmegaNum.pow(2, tier)), OmegaNum.pow(10, OmegaNum.pow(2, tier)), player.generators[0][0][a][x].bought))
+            player.generators[0][0][a][x].bought = OmegaNum.add(generators[a][x].bought, OmegaNum.affordGeometricSeries(player.points[0][0][a], OmegaNum.pow(10, OmegaNum.pow(2, tier)), OmegaNum.pow(10, OmegaNum.pow(2, tier)), player.generators[0][0][a][x].bought).sub(1))
             player.points[0][0][a] = OmegaNum.sub(points[a], Generators.cost(a,x))
             player.generators[0][0][a][x].bought = OmegaNum.add(generators[a][x].bought, 1)
         }
@@ -88,14 +97,15 @@ const Generators = {
             this.buyMax(x, i)
         }
     },
-    hiddenMultiplier(x) {
-        if (x > 1 || highestGenerator[0].lte(10)) {
+    hiddenMultiplier(a,x) {
+        if (x > 1 || OmegaNum.lte(highestGenerator[a], 10)) {
             return new OmegaNum(1)
         } else {
-            let t = new OmegaNum(player.timePlayed)
-            let n = player.highestGenerator[0][0][0].sub(10)
-            let m = OmegaNum.pow(2, player.points[0][0][0].max(100).logBase(100).sub(1))
-            return t.pow(n).mul(m.pow(2 - (1 / n)))
+            let t = new OmegaNum(player.timeInRun[0][0][a])
+            let n = player.highestGenerator[0][0][a].sub(10)
+            let m = OmegaNum.pow(2, OmegaNum.max(player.points[0][0][a], 100).logBase(100).sub(1))
+            let p = Generators.powerMultiplier(a)
+            return t.pow(n).mul(m.pow(2 - (1 / n))).mul(p.pow(n))
         }
     },
     powerMultiplier(x) {
@@ -111,7 +121,7 @@ const Generators = {
 
 const Prestige = {
     formula(x) {
-        return OmegaNum.pow(10, player.points[0][0][x-1].log10().div(24)).floor()
+        return OmegaNum.pow(10, new OmegaNum(player.points[0][0][x-1]).log10().div(24)).floor()
     },
     reset(x, force) {
         if (force || new OmegaNum(player.points[0][0][x-1]).gte(1e24)) {
@@ -119,6 +129,7 @@ const Prestige = {
             player.points[0][0][x-1] = x == 1 ? new OmegaNum(10) : new OmegaNum(0)
             player.generators[0][0][x-1].splice(0, player.generators[0][0][x-1].length)
             player.highestGenerator[0][0][x-1] = new OmegaNum(10)
+            player.timeInRun[0][0][x-1] = new OmegaNum(0)
             if (x > 1) {
                 player.power[0][0][x-1] = new OmegaNum(1)
                 Prestige.reset(x-1)
