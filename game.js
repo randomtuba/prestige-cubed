@@ -141,7 +141,8 @@ const Generators = {
 
 const Prestige = {
     formula(x) {
-        return OmegaNum.pow(10, OmegaNum.max(player.points[0][0][x-1], 1e24).div(1e24).log10().div(20).pow(0.95)).mul(10).floor()
+        let amt = new OmegaNum(player.points[0][0][x-1])
+        return OmegaNum.pow(10, (amt.logBase(1e24).sub(1)).mul(9).div(OmegaNum.logBase(amt.log10(), 2))).mul(10).floor()
     },
     reset(x, force) {
         if (force || new OmegaNum(player.points[0][0][x-1]).gte(1e24)) {
