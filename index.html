@@ -40,10 +40,10 @@
                             <br><button @click="Generators.maxAll(a)">Max All</button>
                         </span>
                         <span v-if="player.autoBuyMax[0][0][a] != undefined">
-                            <button onclick="player.autoBuyMax[0][0][a] = !player.autoBuyMax[0][0][a]">Auto buy max: {{player.autoBuyMax[0][0][a] ? "ON" : "OFF"}}</button>
+                            <button @click="player.autoBuyMax[0][0][a] = !player.autoBuyMax[0][0][a]">Auto buy max: {{player.autoBuyMax[0][0][a] ? "ON" : "OFF"}}</button>
                         </span>
                         <span v-if="player.autoRelativeGain[0][0][a] != undefined">
-                            <button onclick="player.autoRelativeGain[0][0][a] = !player.autoRelativeGain[0][0][a]">Auto relative gain: {{player.autoRelativeGain[0][0][a] ? "ON" : "OFF"}}</button>
+                            <button @click="player.autoRelativeGain[0][0][a] = !player.autoRelativeGain[0][0][a]">Auto relative gain: {{player.autoRelativeGain[0][0][a] ? "ON" : "OFF"}}</button>
                         </span>
                     </td>
                 </tr>

@@ -125,7 +125,7 @@ const Generators = {
             let n = new OmegaNum(player.highestGenerator[0][0][a]).sub(10)
             let m = OmegaNum.pow(2, OmegaNum.max(player.points[0][0][a], 100).logBase(100).sub(1))
             let p = Generators.powerMultiplier(a)
-            return t.pow(n).mul(m.pow(2 - (1 / n))).mul(p.pow(n))
+            return t.pow(n).mul(m.pow(2 - (1 / (OmegaNum.pow(2,n))))).mul(p.pow(n))
         }
     },
     powerMultiplier(x) {
@@ -141,7 +141,7 @@ const Generators = {
 
 const Prestige = {
     formula(x) {
-        let amt = new OmegaNum(player.points[0][0][x-1])
+        let amt = new OmegaNum(player.points[0][0][x-1]).max(1e24)
         return OmegaNum.pow(10, (amt.logBase(1e24).sub(1)).mul(9).div(OmegaNum.logBase(amt.log10(), 2))).mul(10).floor()
     },
     reset(x, force) {
