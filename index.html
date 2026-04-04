@@ -22,16 +22,28 @@
                 <tr>
                     <td style="border: 4px solid #ffffff; text-align: center" class="generator">
                         You have {{format(player.points[0][0][0])}} points.
-                        <span v-if="player.power[0][0][1] != undefined && OmegaNum(player.power[0][0][1]).gt(0)">
+                        <span v-if="player.highestPrestige.gt(0)">
                             <br><button onclick="Generators.maxAll(0)">Max All</button>
+                        </span>
+                        <span v-if="player.autoBuyMax[0][0][0] != undefined">
+                            <button onclick="player.autoBuyMax[0][0][0] = !player.autoBuyMax[0][0][0]">Auto buy max: {{player.autoBuyMax[0][0][0] ? "ON" : "OFF"}}</button>
+                        </span>
+                        <span v-if="player.autoRelativeGain[0][0][0] != undefined">
+                            <button onclick="player.autoRelativeGain[0][0][0] = !player.autoRelativeGain[0][0][0]">Auto relative gain: {{player.autoRelativeGain[0][0][0] ? "ON" : "OFF"}}</button>
                         </span>
                     </td>
                     <td v-for="a in player.points[0][0].length - 1" style="border: 4px solid #ffffff; text-align: center" class="generator">
                         You have {{format(player.points[0][0][a])}} Tier {{a}} prestige points and {{format(player.power[0][0][a])}} Tier {{a}} prestige power.<br>
                         <button v-if="new OmegaNum(player.points[0][0][a-1]).lt(1e24)">1e24 required</button>
                         <button v-if="new OmegaNum(player.points[0][0][a-1]).gte(1e24)" @click="Prestige.reset(a, false)">Prestige (+{{format(Prestige.formula(a))}})</button>
-                        <span v-if="player.power[0][0][a+1] != undefined && OmegaNum(player.power[0][0][a+1]).gt(0)">
+                        <span v-if="player.highestPrestige.gt(a)">
                             <br><button @click="Generators.maxAll(a)">Max All</button>
+                        </span>
+                        <span v-if="player.autoBuyMax[0][0][a] != undefined">
+                            <button onclick="player.autoBuyMax[0][0][a] = !player.autoBuyMax[0][0][a]">Auto buy max: {{player.autoBuyMax[0][0][a] ? "ON" : "OFF"}}</button>
+                        </span>
+                        <span v-if="player.autoRelativeGain[0][0][a] != undefined">
+                            <button onclick="player.autoRelativeGain[0][0][a] = !player.autoRelativeGain[0][0][a]">Auto relative gain: {{player.autoRelativeGain[0][0][a] ? "ON" : "OFF"}}</button>
                         </span>
                     </td>
                 </tr>

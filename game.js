@@ -24,7 +24,7 @@ function mainLoop(){
     fillArrays()
 
     // produce points
-    if (generators[0][0] != undefined) player.points[0][0][0] = points[0].add(OmegaNum.mul(generators[0][0].amount, Generators.mult(0,0)).mul(diff))
+    if (generators[0][0] != undefined) player.points[0][0][0] = player.points[0][0][0].add(OmegaNum.mul(generators[0][0].amount, Generators.mult(0,0)).mul(diff))
 
     // i is for generator #, j is for prestige layer tier (0 is normal generator)
     for (let j = 0; j < generators.length; j++) {
@@ -34,6 +34,18 @@ function mainLoop(){
         for (let i = 1; i < generators[j].length; i++) {
             // generator produces the previous one
             player.generators[0][0][j][i-1].amount = OmegaNum.add(generators[j][i-1].amount, OmegaNum.mul(generators[j][i].amount, Generators.mult(j,i)).mul(Generators.hiddenMultiplier(j,i)).mul(diff))
+        }
+    }
+
+    // run autobuyers
+    for (let i = 0; i < player.autoBuyMax[0][0].length; i++) {
+        if (player.autoBuyMax[0][0][i]) {
+            Generators.maxAll(i)
+        }
+    }
+    for (let i = 0; i < player.autoRelativeGain[0][0].length; i++) {
+        if (player.autoRelativeGain[0][0][i]) {
+            player.points[0][0][i+1] = OmegaNum.add(player.points[0][0][i+1], Prestige.formula(i+1).mul(diff))
         }
     }
 }
@@ -62,6 +74,14 @@ function fillArrays() {
         player.points[0][0].push(new OmegaNum(0))
         player.power[0][0].push(new OmegaNum(1))
         player.timeInRun[0][0].push(new OmegaNum(0))
+    }
+
+    // check for autobuyers
+    if (player.highestPrestige.gt(player.autoBuyMax[0][0].length + 1)) {
+        player.autoBuyMax[0][0].push(true)
+    }
+    if (player.highestPrestige.gt(player.autoRelativeGain[0][0].length + 2)) {
+        player.autoRelativeGain[0][0].push(true)
     }
 }
 
@@ -102,7 +122,7 @@ const Generators = {
             return new OmegaNum(1)
         } else {
             let t = new OmegaNum(player.timeInRun[0][0][a])
-            let n = player.highestGenerator[0][0][a].sub(10)
+            let n = new OmegaNum(player.highestGenerator[0][0][a]).sub(10)
             let m = OmegaNum.pow(2, OmegaNum.max(player.points[0][0][a], 100).logBase(100).sub(1))
             let p = Generators.powerMultiplier(a)
             return t.pow(n).mul(m.pow(2 - (1 / n))).mul(p.pow(n))
@@ -121,18 +141,21 @@ const Generators = {
 
 const Prestige = {
     formula(x) {
-        return OmegaNum.pow(10, new OmegaNum(player.points[0][0][x-1]).log10().div(24)).floor()
+        return OmegaNum.pow(10, OmegaNum.max(player.points[0][0][x-1], 1e24).div(1e24).log10().div(20).pow(0.95)).mul(10).floor()
     },
     reset(x, force) {
         if (force || new OmegaNum(player.points[0][0][x-1]).gte(1e24)) {
-            player.points[0][0][x] = new OmegaNum(player.points[0][0][x]).add(Prestige.formula(x))
+            if (!force) {
+                player.points[0][0][x] = new OmegaNum(player.points[0][0][x]).add(Prestige.formula(x))
+                if (player.highestPrestige.lt(x)) player.highestPrestige = new OmegaNum(x)
+            }
             player.points[0][0][x-1] = x == 1 ? new OmegaNum(10) : new OmegaNum(0)
             player.generators[0][0][x-1].splice(0, player.generators[0][0][x-1].length)
             player.highestGenerator[0][0][x-1] = new OmegaNum(10)
             player.timeInRun[0][0][x-1] = new OmegaNum(0)
             if (x > 1) {
                 player.power[0][0][x-1] = new OmegaNum(1)
-                Prestige.reset(x-1)
+                Prestige.reset(x-1, true)
             }
         }
     }

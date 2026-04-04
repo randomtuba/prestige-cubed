@@ -9,6 +9,9 @@ function start() {
     highestGenerator: [[[new OmegaNum(10)]]],
     power: [[[null]]],
     timeInRun: [[[new OmegaNum(0)]]],
+    highestPrestige: new OmegaNum(0),
+    autoBuyMax: [[[]]],
+    autoRelativeGain: [[[]]],
   };
   return start;
 }
