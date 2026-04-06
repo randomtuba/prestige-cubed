@@ -12,6 +12,7 @@ function start() {
     highestPrestige: new OmegaNum(0),
     autoBuyMax: [[[]]],
     autoRelativeGain: [[[]]],
+    singularityPower: [[new OmegaNum(0)]],
   };
   return start;
 }

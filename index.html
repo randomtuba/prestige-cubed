@@ -46,6 +46,9 @@
                             <button @click="player.autoRelativeGain[0][0][a] = !player.autoRelativeGain[0][0][a]">Auto relative gain: {{player.autoRelativeGain[0][0][a] ? "ON" : "OFF"}}</button>
                         </span>
                     </td>
+                    <td style="border: 4px solid #ffffff; text-align: center" class="generator" v-if="OmegaNum.gte(player.points[0][0][0], '1e1e9') || OmegaNum.gt(player.singularityPower[0][0], 0)">
+                        You have {{format(player.singularityPower[0][0])}} singularity power, making all generator multipliers x^{{format(SingularityPower.effect(), 5)}}.
+                    </td>
                 </tr>
                 <tr v-for="a in Math.max(...player.generators[0][0].map(arr => arr.length))">
                     <td style="border: 4px solid #ffffff; text-align: center" class="generator" :style="{visiblity: player.generators[0][0][0][a-1] != undefined ? 'visible' : 'hidden', borderColor: player.generators[0][0][0][a-1] != undefined ? 'white' : 'black'}">

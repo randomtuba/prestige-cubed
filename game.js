@@ -48,6 +48,10 @@ function mainLoop(){
             player.points[0][0][i+1] = OmegaNum.add(player.points[0][0][i+1], Prestige.formula(i+1).mul(diff))
         }
     }
+
+    // produce singularity power
+    if (OmegaNum.gte(player.points[0][0][0], "1e1e9"))
+        player.singularityPower[0][0] = OmegaNum.add(player.singularityPower[0][0], SingularityPower.generation().mul(diff))
 }
 
 setInterval(mainLoop, 40);
@@ -87,7 +91,7 @@ function fillArrays() {
 
 const Generators = {
     mult(a,x) {
-        return OmegaNum.pow(2, player.generators[0][0][a][x].bought).mul(Generators.powerMultiplier(a))
+        return OmegaNum.pow(2, player.generators[0][0][a][x].bought).mul(Generators.powerMultiplier(a)).pow(SingularityPower.effect())
     },
     cost(a,x) {
         let tier = OmegaNum.add(x, new OmegaNum(player.highestGenerator[0][0][a]).sub(10))
@@ -125,7 +129,7 @@ const Generators = {
             let n = new OmegaNum(player.highestGenerator[0][0][a]).sub(10)
             let m = OmegaNum.pow(2, OmegaNum.max(player.points[0][0][a], 100).logBase(100).sub(1))
             let p = Generators.powerMultiplier(a)
-            return t.pow(n).mul(m.pow(2 - (1 / (OmegaNum.pow(2,n))))).mul(p.pow(n))
+            return t.pow(n).mul(m.pow(2 - (1 / (OmegaNum.pow(2,n))))).mul(p.pow(n)).pow(SingularityPower.effect())
         }
     },
     powerMultiplier(x) {
@@ -159,5 +163,17 @@ const Prestige = {
                 Prestige.reset(x-1, true)
             }
         }
+    }
+}
+
+const SingularityPower = {
+    generation() {
+        return OmegaNum.log10(player.points[0][0][0]).div(1e9).pow(3)
+    },
+    effect() {
+        return OmegaNum.add(1, this.effectCap().sub(1).mul(OmegaNum.sub(1, OmegaNum.pow(Math.E, player.singularityPower[0][0].log10().div(8).mul(-1)))))
+    },
+    effectCap() {
+        return new OmegaNum(1.006)
     }
 }
