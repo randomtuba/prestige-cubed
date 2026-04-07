@@ -171,7 +171,7 @@ const SingularityPower = {
         return OmegaNum.log10(player.points[0][0][0]).div(1e9).pow(3)
     },
     effect() {
-        return OmegaNum.add(1, this.effectCap().sub(1).mul(OmegaNum.sub(1, OmegaNum.pow(Math.E, player.singularityPower[0][0].log10().div(8).mul(-1)))))
+        return OmegaNum.add(1, this.effectCap().sub(1).mul(OmegaNum.sub(1, OmegaNum.pow(Math.E, player.singularityPower[0][0].max(1).log10().div(8).mul(-1)))))
     },
     effectCap() {
         return new OmegaNum(1.006)
